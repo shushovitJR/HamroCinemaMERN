@@ -4,7 +4,7 @@ import Loading from '../Components/Loading'
 import BackGradientRed from '../components/BackGradientRed'
 import BackGradientBlue from '../components/BackGradientBlue'
 import timeFormat from '../lib/timeformat'
-import { DateFormat } from '../lib/dateformat'
+import { DateFormat } from '../lib/DateFormat'
 import { useAppContext } from '../context/AppContext'
 import { Link } from 'react-router-dom'
 
