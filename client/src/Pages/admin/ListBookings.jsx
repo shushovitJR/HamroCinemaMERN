@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Title from "../../Components/admin/Title.jsx";
-import { DateFormat } from "../../lib/dateformat";
-import { dummyBookingData } from "../../assets/assets";
+import { DateFormat } from "../../lib/DateFormat";
 import Loading from "../../Components/Loading.jsx";
 import { useAppContext } from "../../context/AppContext";
 

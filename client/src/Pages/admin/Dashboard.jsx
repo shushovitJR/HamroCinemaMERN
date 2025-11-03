@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { dummyDashboardData } from '../../assets/assets';
 import Loading from '../../Components/Loading';
 import Title from '../../Components/admin/Title';
-import BackGradientRed from '../../Components/BackGradientRed';
-import { DateFormat } from '../../lib/dateformat';
+import BackGradientRed from '../../components/BackGradientRed';
+import { DateFormat } from '../../lib/DateFormat';
 import { useAppContext } from '../../context/AppContext';
 
 const Dashboard = () => {
