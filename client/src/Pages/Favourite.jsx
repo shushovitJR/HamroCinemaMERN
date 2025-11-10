@@ -1,3 +1,4 @@
+/* eslint-disable react/react-in-jsx-scope */
 // import { dummyShowsData } from "../assets/assets"
 import BackGradientBlue from "../Components/BackGradientBlue"
 import BackGradientRed from "../Components/BackGradientRed"
