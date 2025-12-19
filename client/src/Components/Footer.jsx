@@ -1,42 +1,93 @@
 import { assets } from "../assets/assets"
+import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
 
 const Footer = () => {
   return (
-    <footer className="px-6 pt-8 md:px-16 lg:px-36 w-full text-gray-300">
-            <div className="flex flex-col md:flex-row justify-between w-full gap-10 border-b border-gray-500 pb-10">
-                <div className="md:max-w-150">
-                    <img alt="logo" className="h-25 -mx-11" src={assets.MainLogo} />
-                    <p className="mt-5 text-sm mb-5">
-                        Hamro Cinema has been the industry's standard cinema watching since the 2025s, when the gap between the entertainment came across and make people's life work loaded, Harmro Cinema started granting entertainment services.
-                    </p>
-                    <div className="flex items-center gap-2 mt-8">
-                        <img src={assets.googleplayic} alt="playstore" className="h-10 w-auto" />
-                        <img src={assets.appstoreic} alt="appstore" className="h-10 w-auto" />
-                    </div>
-                </div>
-                <div className="flex-1 flex items-start md:justify-end gap-20 md:gap-40">
-                    <div>
-                        <h2 className="font-semibold mb-5">Hamro Cinema</h2>
-                        <ul className="text-sm space-y-2">
-                            <li><a href="#">Home</a></li>
-                            <li><a href="#">About us</a></li>
-                            <li><a href="#">Contact us</a></li>
-                            <li><a href="#">Privacy policy</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h2 className="font-semibold mb-5">Get in touch</h2>
-                        <div className="text-sm space-y-2">
-                            <p>+977-9862912069</p>
-                            <p>hamrocinema@gmail.com</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <p className="pt-4 text-center text-sm pb-5">
-                Copyright {new Date().getFullYear()} © HamroCinema. All Right Reserved.
+    <footer className="bg-gradient-to-b from-black/50 to-black border-t border-gray-800">
+      {/* Main footer content */}
+      <div className="container-fluid section-padding">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-12">
+          
+          {/* Brand section */}
+          <div className="space-y-6">
+            <img alt="Hamro Cinema Logo" className="h-12 w-auto" src={assets.MainLogo} />
+            <p className="text-sm text-gray-400 leading-relaxed">
+              Hamro Cinema has been the industry's standard cinema watching experience, granting entertainment services with excellence since 2025.
             </p>
-        </footer>
+            <div className="flex items-center gap-3">
+              <img src={assets.googleplayic} alt="Google Play" className="h-10 w-auto hover:opacity-80 transition cursor-pointer" />
+              <img src={assets.appstoreic} alt="App Store" className="h-10 w-auto hover:opacity-80 transition cursor-pointer" />
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Quick Links</h3>
+            <ul className="space-y-3 text-gray-400 text-sm">
+              <li><a href="#" className="hover:text-red-500 transition">Home</a></li>
+              <li><a href="#" className="hover:text-red-500 transition">About Us</a></li>
+              <li><a href="#" className="hover:text-red-500 transition">Movies</a></li>
+              <li><a href="#" className="hover:text-red-500 transition">Bookings</a></li>
+            </ul>
+          </div>
+
+          {/* Information */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Information</h3>
+            <ul className="space-y-3 text-gray-400 text-sm">
+              <li><a href="#" className="hover:text-red-500 transition">Privacy Policy</a></li>
+              <li><a href="#" className="hover:text-red-500 transition">Terms of Service</a></li>
+              <li><a href="#" className="hover:text-red-500 transition">Contact Us</a></li>
+              <li><a href="#" className="hover:text-red-500 transition">FAQ</a></li>
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Get in Touch</h3>
+            <div className="space-y-3 text-gray-400 text-sm">
+              <div className="flex items-start gap-3">
+                <Phone className="w-4 h-4 mt-1 flex-shrink-0 text-red-500" />
+                <p>+977-9862912069</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <Mail className="w-4 h-4 mt-1 flex-shrink-0 text-red-500" />
+                <p>hamrocinema@gmail.com</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <MapPin className="w-4 h-4 mt-1 flex-shrink-0 text-red-500" />
+                <p>Kathmandu, Nepal</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-gray-800 pt-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-gray-500">
+              Copyright © {new Date().getFullYear()} Hamro Cinema. All rights reserved.
+            </p>
+            
+            {/* Social Links */}
+            <div className="flex items-center gap-4">
+              <a href="#" className="text-gray-400 hover:text-red-500 transition" aria-label="Facebook">
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a href="#" className="text-gray-400 hover:text-red-500 transition" aria-label="Twitter">
+                <Twitter className="w-5 h-5" />
+              </a>
+              <a href="#" className="text-gray-400 hover:text-red-500 transition" aria-label="Instagram">
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a href="#" className="text-gray-400 hover:text-red-500 transition" aria-label="LinkedIn">
+                <Linkedin className="w-5 h-5" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
   )
 }
 

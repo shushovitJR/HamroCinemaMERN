@@ -1,6 +1,5 @@
 import { ChartLineIcon, CircleDollarSignIcon, PlayCircleIcon, StarIcon, UsersIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { dummyDashboardData } from '../../assets/assets';
 import Loading from '../../Components/Loading';
 import Title from '../../Components/admin/Title';
 import BackGradientRed from '../../Components/BackGradientRed';
@@ -9,93 +8,157 @@ import { useAppContext } from '../../context/AppContext';
 
 const Dashboard = () => {
 
-  const{axios, getToken, user, image_base_url} = useAppContext()
+  const { axios, getToken, user, image_base_url } = useAppContext()
 
   const currency = import.meta.env.VITE_CURRENCY;
 
   const [dashboardData, setDashboardData] = useState({
     totalBookings: 0,
     totalRevenue: 0,
-    activeShows: 0,
+    activeShows: [],
     totalUser: 0,
   });
 
   const [loading, setLoading] = useState(true);
 
   const dashboardCards = [
-    { title: 'Total Bookings', value: String(dashboardData.totalBookings || 0), icon: ChartLineIcon },
-    { title: 'Total Revenue', value: `${currency}${dashboardData.totalRevenue || 0}`, icon: CircleDollarSignIcon },
-    { title: 'Active Shows', value: String(dashboardData.activeShows?.length || 0), icon: PlayCircleIcon },
-    { title: 'Total Users', value: String(dashboardData.totalUser || 0), icon: UsersIcon },
+    { title: 'Total Bookings', value: String(dashboardData.totalBookings || 0), icon: ChartLineIcon, color: 'blue' },
+    { title: 'Total Revenue', value: `${currency}${dashboardData.totalRevenue || 0}`, icon: CircleDollarSignIcon, color: 'green' },
+    { title: 'Active Shows', value: String(dashboardData.activeShows?.length || 0), icon: PlayCircleIcon, color: 'purple' },
+    { title: 'Total Users', value: String(dashboardData.totalUser || 0), icon: UsersIcon, color: 'orange' },
   ];
 
   const fetchDashboardData = async () => {
- 
-    try{
-      const { data } = await axios.get("/api/admin/dashboard", {headers: { Authorization: `Bearer ${await getToken()}` }})
-      if(data.success){
+
+    try {
+      const { data } = await axios.get("/api/admin/dashboard", { headers: { Authorization: `Bearer ${await getToken()}` } })
+      if (data.success) {
         setDashboardData(data.dashboardData)
         setLoading(false)
       } else {
-        toast.error(data.message)
+        console.error(data.message)
       }
-    } catch(error){
-      toast.error("Error fetching dashboard data:",error)
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error)
     }
   };
 
   useEffect(() => {
-    if(user){
+    if (user) {
       fetchDashboardData();
     }
   }, [user]);
+
+  const getCardColor = (color) => {
+    switch (color) {
+      case 'blue':
+        return 'from-blue-600/20 to-blue-900/20 border-blue-600/30';
+      case 'green':
+        return 'from-green-600/20 to-green-900/20 border-green-600/30';
+      case 'purple':
+        return 'from-purple-600/20 to-purple-900/20 border-purple-600/30';
+      case 'orange':
+        return 'from-orange-600/20 to-orange-900/20 border-orange-600/30';
+      default:
+        return 'from-red-600/20 to-red-900/20 border-red-600/30';
+    }
+  };
+
+  const getIconColor = (color) => {
+    switch (color) {
+      case 'blue':
+        return 'text-blue-400';
+      case 'green':
+        return 'text-green-400';
+      case 'purple':
+        return 'text-purple-400';
+      case 'orange':
+        return 'text-orange-400';
+      default:
+        return 'text-red-400';
+    }
+  };
 
   return !loading ? (
     <>
       <Title text1="Admin " text2="Dashboard" />
 
-      <div className="relative flex flex-wrap gap-4 mt-6">
+      <div className="relative mt-8 space-y-8">
         <BackGradientRed />
-        <div className="flex flex-wrap gap-4 w-full">
+
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {dashboardCards.map((card, index) => {
             const Icon = card.icon;
             return (
               <div
                 key={index}
-                className="flex items-center justify-between px-4 py-3 bg-primary/10 border border-primary/20 rounded-md 
-                sm:w-[48%] md:w-[23%] w-full"
+                className={`card bg-gradient-to-br ${getCardColor(card.color)} hover:shadow-lg transition-all duration-300`}
               >
-                <div>
-                  <h1 className="text-sm">{card.title}</h1>
-                  <p className="text-xl font-medium mt-1">{String(card.value)}</p>
+                <div className='flex items-center justify-between'>
+                  <div className='flex-1'>
+                    <p className="text-sm text-gray-400 font-medium">{card.title}</p>
+                    <p className="text-2xl lg:text-3xl font-bold text-white mt-2">{String(card.value)}</p>
+                  </div>
+                  <Icon className={`w-8 h-8 ${getIconColor(card.color)} opacity-80`} />
                 </div>
-                <Icon className="w-6 h-6 text-primary" />
               </div>
             );
           })}
         </div>
-      </div>
-      <p className='mt-10 text-lg  font-medium '> Active Shows</p>
-      <div className='relative flex flex-wrap gap-6 mt-4 max-w-5xl'>
-        {dashboardData.activeShows.map((show) => (
-            <div key={show._id} className='w-55 rounded-lg overflow-hidden h-full
-            pb-3 bg-primary/10 border border-primary/20 hover:-translate-y-1 transition duration-300'>
-                <img src={image_base_url + show.movie.poster_path} alt="" className=' h-80 w-full object-cover' /> 
-                <p className='font-medium p-2 truncate'>{show.movie.title}</p>
-                <div className='flex items-center justify-between px-2'>
-                    <p className='text-lg font-medium'>{currency} {show.showPrice}</p>
-                    <p className='flex items-center gap-1 text-sm text-gray-300 mt-1 pr-1 '>
-                        <StarIcon className='w-4 h-4 text-[#F5C518] fill-[#F5C518]'/>
-                        {show.movie.vote_average.toFixed(2)}
+
+        {/* Active Shows Section */}
+        <div>
+          <div className='mb-6'>
+            <h2 className='text-2xl lg:text-3xl font-bold text-white'>Active Shows</h2>
+            <p className='text-gray-400 mt-1'>Currently showing movies and their details</p>
+          </div>
+
+          {dashboardData.activeShows.length > 0 ? (
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+              {dashboardData.activeShows.map((show) => (
+                <div key={show._id} className='card group hover:border-red-600/50 overflow-hidden'>
+                  {/* Poster Image */}
+                  <div className='relative overflow-hidden aspect-video bg-gray-900 mb-3'>
+                    <img
+                      src={image_base_url + show.movie.poster_path}
+                      alt={show.movie.title}
+                      className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
+                    />
+                    {/* Rating Badge */}
+                    <div className='absolute top-2 right-2 bg-black/80 px-2 py-1 rounded-lg flex items-center gap-1'>
+                      <StarIcon className='w-4 h-4 text-yellow-400 fill-yellow-400' />
+                      <span className='text-sm font-semibold'>{show.movie.vote_average.toFixed(1)}</span>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className='space-y-3'>
+                    <p className='font-semibold text-white truncate group-hover:text-red-400 transition'>
+                      {show.movie.title}
                     </p>
+
+                    {/* Price */}
+                    <div className='flex items-center justify-between pt-3 border-t border-gray-800'>
+                      <p className='text-gray-400 text-sm'>Show Price</p>
+                      <p className='text-lg font-bold text-red-500'>{currency}{show.showPrice}</p>
+                    </div>
+
+                    {/* Date/Time */}
+                    <p className='text-xs text-gray-500'>
+                      {DateFormat(show.showDateTime)}
+                    </p>
+                  </div>
                 </div>
-                <p className='px-2 pt-2 text-sm text-gray-500'>
-                    {DateFormat(show.showDateTime)}
-                    </p>
-
+              ))}
             </div>
-
-        ))}
+          ) : (
+            <div className='card text-center py-12'>
+              <PlayCircleIcon className='w-12 h-12 mx-auto text-gray-600 mb-3' />
+              <p className='text-gray-400'>No active shows available</p>
+            </div>
+          )}
+        </div>
       </div>
     </>
   ) : (

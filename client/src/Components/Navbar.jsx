@@ -1,6 +1,6 @@
 import { assets } from '../assets/assets'
-import { Link, useNavigate } from 'react-router-dom'
-import { MenuIcon, SearchIcon, TicketPlus, XIcon, Bell } from 'lucide-react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { MenuIcon, SearchIcon, TicketPlus, XIcon, Bell, Home, Clapperboard, Heart } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react'
 import { useAppContext } from '../context/AppContext'
@@ -10,18 +10,29 @@ import useRecommendations from './useRecommendations'
 const Navbar = () => {
     const { setSearchTerm, favouriteMovies } = useAppContext();
     const [isOpen, setIsOpen] = useState(false)
+    const [scrolled, setScrolled] = useState(false)
     const { user } = useUser()
     const { openSignIn } = useClerk()
     const navigate = useNavigate()
+    const location = useLocation()
 
     const [showSearch, setShowSearch] = useState(false);
     const [input, setInput] = useState('');
-
-    // 🔔 Recommendation state
     const [showRecs, setShowRecs] = useState(false);
-    // const [recs, setRecs] = useState([]);
     const recs = useRecommendations();
 
+    // Handle scroll effect
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 10)
+        }
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
+
+    const isActive = (path) => {
+        return location.pathname === path ? 'text-red-500' : 'text-white'
+    }
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -30,136 +41,177 @@ const Navbar = () => {
         navigate('/movies');
     };
 
-    // 🔔 Fetch recommendations when dropdown is opened
-    
-  useEffect(() => {
-    axios.get("/api/recommend")
-      .then(res => setRecs(res.data.recommendations))
-      .catch(err => console.error(err));
-  }, []);
-// useEffect(() => {
-//   if (showRecs) {
-//     const newRecs = useRecommendations();
-//     setRecs(newRecs);
-//   }
-// }, [showRecs]);
+    const handleNavClick = () => {
+        setIsOpen(false)
+        scrollTo(0, 0)
+    }
+
+    useEffect(() => {
+        axios.get("/api/recommend")
+            .then(res => setRecs(res.data.recommendations))
+            .catch(err => console.error(err));
+    }, []);
 
     return (
-      <div className='fixed w-full lg:w-[190vh] top-0 left-0 z-50 flex items-center justify-between px-6 md:px-16 lg:px-36 py-2 -mx-5 md:-mx-20 md:-my-0 lg:backdrop-blur-[5px] lg:border-white/10 lg:border-[2px] gap-2 '>
-        {/* Logo */}
-        <div>
-            <Link to='/' className='max-md:flex-1'>
-              <img onClick={()=>{navigate('/');scrollTo(0,0)}} src={assets.MainLogo} alt='logo' className='w-70 h-auto cursor-pointer' />
-            </Link>
-        </div>
-        <div/>
-
-        {/* Links */}
-        <div className={`max-md:absolute max-md:top-0 max-md:left-0 max-md:font-medium
-            md:text-lg z-50 flex flex-col md:flex-row items-center lg:mx-20
-            max-md:justify-center gap-10 min-md:px-8 py-3 max-md:h-screen 
-            min-md:rounded-full backdrop-blur-[90px] bg-black md:bg-black/30 md:border
-            border-gray-300/20 overflow-hidden transition-[width] duration-300  ${isOpen ? 'max-md:w-full' : 'max-md:w-0'}`}>
-
-            <XIcon className ='md:hidden absolute top-6 right-6 w-6 h-6 cursor-pointer ' onClick={() => setIsOpen(false)}/>
-            <Link onClick={()=>{scrollTo(0,0); setIsOpen(false)}} className='hover:text-red-500 hover:scale-105' to='/'>Home</Link>
-            <Link onClick={()=>{scrollTo(0,0); setIsOpen(false)}} className='hover:text-red-500 hover:scale-105' to='/movies'>Movies</Link>
-            <Link onClick={()=>{scrollTo(0,0); setIsOpen(false)}} className='hover:text-red-500 hover:scale-105' to='/movies'>Releases</Link>
-            {favouriteMovies.length>0 && <Link onClick={()=>{scrollTo(0,0); setIsOpen(false)}} className='hover:text-red-500 hover:scale-105' to='/favourite'>Favourite</Link>}
-        </div>
-
-        {/* Right side icons */}
-        <div className='flex items-center gap-8 relative'>
-            {/* Search */}
-            <SearchIcon className='hidden lg:block w-8 h-8 cursor-pointer hover:text-red-500 md:text-white'
-                onClick={()=>setShowSearch(!showSearch)} />
-            {showSearch && (
-                <div className="absolute top-20 right-10 bg-white rounded shadow-lg p-2 flex text-black">
-                  <input
-                      type="text"
-                      value={input}
-                      onChange={e => {
-                          setInput(e.target.value);
-                          setSearchTerm(e.target.value); 
-                          navigate('/movies'); 
-                      }}
-                      placeholder="Search movies..."
-                      className="px-2 py-1 border rounded"
-                      autoFocus
-                  />
+        <nav className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
+            scrolled ? 'bg-black/95 backdrop-blur-lg shadow-lg border-b border-gray-700/50' : 'bg-gradient-to-b from-black/80 to-black/30'
+        }`}>
+            {/* Main navbar container */}
+            <div className='flex items-center justify-between px-4 sm:px-6 md:px-16 lg:px-36 py-3 sm:py-4'>
+                
+                {/* Logo */}
+                <div className='flex-shrink-0'>
+                    <Link to='/' onClick={handleNavClick}>
+                        <img src={assets.MainLogo} alt='Hamro Cinema' className='h-10 sm:h-12 w-auto cursor-pointer hover:opacity-80 transition' />
+                    </Link>
                 </div>
-            )}
 
-            {/* 🔔 Bell Icon
-            {user && (
-                <div className="relative">
-                    <Bell
-                      className="w-6 h-6 cursor-pointer hover:text-red-500 text-white"
-                      onClick={() => setShowRecs(!showRecs)}
-                    /> */}
-                    {/* {showRecs && (
-                        <div className="absolute top-12 right-0 bg-white text-black w-64 rounded-lg shadow-lg p-4">
-                            <h3 className="font-semibold mb-2">Recommended Movies</h3>
-                            {recs.length > 0 ? (
-                                <ul className="space-y-1">
-                                    {recs.map((movie, idx) => (
-                                        <li key={idx}>🎬 {movie}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p className="text-sm">No recommendations</p>
-                            )}
+                {/* Desktop Navigation Links - Center */}
+                <div className='hidden md:flex items-center gap-8 lg:gap-12 flex-1 justify-center ml-8'>
+                    <Link 
+                        to='/' 
+                        onClick={handleNavClick}
+                        className={`flex items-center gap-2 text-sm lg:text-base font-medium transition-colors ${isActive('/')}`}
+                    >
+                        <Home className='w-4 h-4' />
+                        <span className='hidden lg:inline'>Home</span>
+                    </Link>
+                    <Link 
+                        to='/movies' 
+                        onClick={handleNavClick}
+                        className={`flex items-center gap-2 text-sm lg:text-base font-medium transition-colors ${isActive('/movies')}`}
+                    >
+                        <Clapperboard className='w-4 h-4' />
+                        <span className='hidden lg:inline'>Movies</span>
+                    </Link>
+                    {favouriteMovies.length > 0 && (
+                        <Link 
+                            to='/favourite' 
+                            onClick={handleNavClick}
+                            className={`flex items-center gap-2 text-sm lg:text-base font-medium transition-colors ${isActive('/favourite')}`}
+                        >
+                            <Heart className='w-4 h-4' />
+                            <span className='hidden lg:inline'>Favourites</span>
+                        </Link>
+                    )}
+                </div>
+
+                {/* Right side - Search, Notifications, Auth */}
+                <div className='flex items-center gap-4 sm:gap-6'>
+                    {/* Search */}
+                    <div className='hidden sm:block relative'>
+                        <SearchIcon 
+                            className='w-5 h-5 cursor-pointer hover:text-red-500 transition text-gray-300'
+                            onClick={() => setShowSearch(!showSearch)}
+                        />
+                        {showSearch && (
+                            <div className="absolute top-full right-0 mt-2 bg-black border border-gray-700 rounded-lg shadow-xl p-3 w-64">
+                                <input
+                                    type="text"
+                                    value={input}
+                                    onChange={e => {
+                                        setInput(e.target.value);
+                                        setSearchTerm(e.target.value);
+                                        navigate('/movies');
+                                    }}
+                                    onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
+                                    placeholder="Search movies..."
+                                    className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+                                    autoFocus
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Auth buttons */}
+                    {!user ? (
+                        <button 
+                            onClick={openSignIn} 
+                            className='px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors'
+                        >
+                            Sign In
+                        </button>
+                    ) : (
+                        <div className='flex items-center gap-4'>
+                            <UserButton 
+                                appearance={{
+                                    elements: {
+                                        userButtonAvatarBox: 'w-8 h-8 sm:w-10 sm:h-10'
+                                    }
+                                }}
+                            >
+                                <UserButton.MenuItems>
+                                    <UserButton.Action label="My Bookings" labelIcon={<TicketPlus width={15}/>} onClick={() => { navigate('/my-bookings'); handleNavClick() }}/>
+                                </UserButton.MenuItems>
+                            </UserButton>
                         </div>
-                    )} */}
-                    {/* {showRecs && (
-  <div className="absolute top-12 right-0 bg-white text-black w-64 rounded-lg shadow-lg p-4">
-    <h3 className="font-semibold mb-2">Recommended Movies</h3>
-    {Array.isArray(recs) && recs.length > 0 ? (
-      <ul className="space-y-1">
-        {recs.map((movie, idx) => (
-          <li key={idx} className="text-sm hover:text-red-500 cursor-pointer">
-            🎬 {movie}
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p className="text-sm">No recommendations</p>
-    )}
-  </div>
-)}
+                    )}
+
+                    {/* Mobile menu button */}
+                    <button 
+                        className='md:hidden p-2 hover:bg-gray-800 rounded-lg transition'
+                        onClick={() => setIsOpen(!isOpen)}
+                    >
+                        {isOpen ? (
+                            <XIcon className='w-6 h-6' />
+                        ) : (
+                            <MenuIcon className='w-6 h-6' />
+                        )}
+                    </button>
                 </div>
-            )} */}
-            {/* <div> */}
-      {/* <h3>Recommended Movies</h3>
-      {recs.length > 0 ? (
-        <ul>
-          {recs.map((movie, idx) => (
-            <li key={idx}>🎬 {movie}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>No recommendations</p>
-      )}
-    </div> */}
+            </div>
 
-            {/* Auth buttons */}
-            {!user ? (
-                <button onClick={openSignIn} className='px-4 py-1 sm:px-7 sm:py-2 bg-primary md:hover:bg-white 
-                    md:border-1 hover:text-primary border:white border-white transition 
-                    rounded-full lg:font-medium cursor-pointer'>LogIn</button>
-            ) : (
-                <UserButton> 
-                    <UserButton.MenuItems>
-                        <UserButton.Action label="My Bookings" labelIcon={<TicketPlus width={15}/>} onClick={() => navigate('/my-bookings')}/>
-                    </UserButton.MenuItems>
-                </UserButton>
+            {/* Mobile Navigation Menu */}
+            {isOpen && (
+                <div className='md:hidden bg-black/95 border-t border-gray-700/50'>
+                    <div className='px-4 py-4 space-y-3'>
+                        <Link 
+                            to='/' 
+                            onClick={handleNavClick}
+                            className='flex items-center gap-2 px-4 py-2 hover:bg-gray-900 rounded-lg transition text-white font-medium'
+                        >
+                            <Home className='w-4 h-4' />
+                            Home
+                        </Link>
+                        <Link 
+                            to='/movies' 
+                            onClick={handleNavClick}
+                            className='flex items-center gap-2 px-4 py-2 hover:bg-gray-900 rounded-lg transition text-white font-medium'
+                        >
+                            <Clapperboard className='w-4 h-4' />
+                            Movies
+                        </Link>
+                        {favouriteMovies.length > 0 && (
+                            <Link 
+                                to='/favourite' 
+                                onClick={handleNavClick}
+                                className='flex items-center gap-2 px-4 py-2 hover:bg-gray-900 rounded-lg transition text-white font-medium'
+                            >
+                                <Heart className='w-4 h-4' />
+                                Favourites
+                            </Link>
+                        )}
+                        
+                        {/* Mobile search */}
+                        <div className='px-4 py-2'>
+                            <input
+                                type="text"
+                                value={input}
+                                onChange={e => {
+                                    setInput(e.target.value);
+                                    setSearchTerm(e.target.value);
+                                    navigate('/movies');
+                                    setIsOpen(false);
+                                }}
+                                placeholder="Search movies..."
+                                className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:border-red-500"
+                            />
+                        </div>
+                    </div>
+                </div>
             )}
-        </div>
-
-        {/* Mobile Menu */}
-        <MenuIcon className='max-md:m1-4 md:hidden w-8 h-8 cursor-pointer' onClick={() => setIsOpen(!isOpen)}/>
-      </div>
-  )
+        </nav>
+    )
 }
 
 export default Navbar
